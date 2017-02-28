@@ -1,21 +1,24 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010/2/10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Data.Common;
 using Dos.ORM;
@@ -23,6 +26,9 @@ using Dos.ORM.Common;
 using Dos.ORM.Common;
 using System.Data;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Threading;
 
 namespace Dos.ORM
 {
@@ -64,22 +70,33 @@ namespace Dos.ORM
             return DataUtils.ConvertValue<TResult>(ToScalar());
         }
 
-
+        /// <summary>
+        /// 返回第一个实体，同ToFirst()。无数据返回Null。
+        /// </summary>
+        /// <returns></returns>
+        public TEntity First<TEntity>()
+        {
+            return ToFirst<TEntity>();
+        }
         /// <summary>
         /// 返回单个实体
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
         public TEntity ToFirst<TEntity>()
-            where TEntity : Entity
         {
-            TEntity t = null;
+            TEntity t = default(TEntity);
             using (IDataReader reader = ToDataReader())
             {
-                var tempt = EntityUtils.Mapper.Map<TEntity>(reader);
-                if (tempt.Any())
+                //var tempt = EntityUtils.Mapper.Map<TEntity>(reader);
+                //if (tempt.Any())
+                //{
+                //    t = tempt.First();
+                //}
+                var result = EntityUtils.ReaderToEnumerable<TEntity>(reader).ToArray();
+                if (result.Any())
                 {
-                    t = tempt.First();
+                    t = result.First();
                 }
                 #region 2015-08-10注释
                 //if (reader.Read())
@@ -107,24 +124,43 @@ namespace Dos.ORM
 
             return t;
         }
-
-
         /// <summary>
         /// 返回实体列表
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
-        public List<TEntity> ToList<TEntity>() //where TEntity : Entity
+        public List<TEntity> ToList<TEntity>()
         {
-            List<TEntity> listT = new List<TEntity>();
+            //List<TEntity> listT = new List<TEntity>();
             using (IDataReader reader = ToDataReader())
             {
-                listT = EntityUtils.Mapper.Map<TEntity>(reader);
-                reader.Close();
+                //listT = EntityUtils.Mapper.Map<TEntity>(reader);
+                //reader.Close();
+                return EntityUtils.ReaderToEnumerable<TEntity>(reader).ToList();
             }
-            return listT;
+            //return listT;
         }
-
+        /// <summary>
+        /// 返回懒加载数据
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <returns></returns>
+        public IEnumerable<TEntity> ToEnumerable<TEntity>()
+        {
+            IEnumerable<TEntity> result;
+            using (IDataReader reader = ToDataReader())
+            {
+                var info = new EntityUtils.CacheInfo()
+                {
+                    Deserializer = EntityUtils.GetDeserializer(typeof(TEntity), reader, 0, -1, false)
+                };
+                while (reader.Read())
+                {
+                    dynamic next = info.Deserializer(reader);
+                    yield return (TEntity)next;
+                }
+            }
+        }
 
         /// <summary>
         /// 返回DataReader

@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010/2/10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,7 @@ namespace Dos.ORM
         /// <param name="assemblyName">Name of the assembly.</param>
         /// <param name="className">Name of the class.</param>
         /// <param name="connectionString">The conn STR.</param>
+        /// <param name="databaseType">The DatabaseType.</param>
         /// <returns>The db provider.</returns>
         public static DbProvider CreateDbProvider(string assemblyName, string className, string connectionString, DatabaseType? databaseType)
         {
@@ -78,7 +80,7 @@ namespace Dos.ORM
                     databaseType = DatabaseType.SqlServer;
                 }
             }
-            else if (string.Compare(className, "System.Data.SqlClient", true) == 0 || string.Compare(className, "Dos.ORM.SqlServer", true) == 0)
+            else if (String.Compare(className, "System.Data.SqlClient", StringComparison.OrdinalIgnoreCase) == 0 || String.Compare(className, "Dos.ORM.SqlServer", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 className = typeof(SqlServer.SqlServerProvider).ToString();
                 if (databaseType == null)
@@ -86,7 +88,7 @@ namespace Dos.ORM
                     databaseType = DatabaseType.SqlServer;
                 }
             }
-            else if (string.Compare(className, "Dos.ORM.SqlServer9", true) == 0 || className.IndexOf("SqlServer9", StringComparison.OrdinalIgnoreCase) >= 0 || className.IndexOf("sqlserver2005", StringComparison.OrdinalIgnoreCase) >= 0 || className.IndexOf("sql2005", StringComparison.OrdinalIgnoreCase) >= 0)
+            else if (String.Compare(className, "Dos.ORM.SqlServer9", StringComparison.OrdinalIgnoreCase) == 0 || className.IndexOf("SqlServer9", StringComparison.OrdinalIgnoreCase) >= 0 || className.IndexOf("sqlserver2005", StringComparison.OrdinalIgnoreCase) >= 0 || className.IndexOf("sql2005", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 className = typeof(SqlServer9.SqlServer9Provider).ToString();
                 if (databaseType == null)
@@ -138,14 +140,8 @@ namespace Dos.ORM
             {
                 System.Reflection.Assembly ass;
 
-                if (assemblyName == null)
-                {
-                    ass = typeof(DbProvider).Assembly;
-                }
-                else
-                {
-                    ass = System.Reflection.Assembly.Load(assemblyName);
-                }
+                ass = assemblyName == null ? typeof(DbProvider).Assembly 
+                    : System.Reflection.Assembly.Load(assemblyName);
 
                 DbProvider retProvider = ass.CreateInstance(className, false, System.Reflection.BindingFlags.Default, null, new object[] { connectionString }, null, null) as DbProvider;
                 if (retProvider != null && databaseType != null)
@@ -203,23 +199,17 @@ namespace Dos.ORM
         {
             Check.Require(connStrName, "connStrName", Check.NotNullOrEmpty);
 
-            DbProvider dbProvider;
-            ConnectionStringSettings connStrSetting = ConfigurationManager.ConnectionStrings[connStrName];
+            var connStrSetting = ConfigurationManager.ConnectionStrings[connStrName];
             Check.Invariant(connStrSetting != null, null, new ConfigurationErrorsException(string.Concat("Cannot find specified connection string setting named as ", connStrName, " in application config file's ConnectionString section.")));
             //2015-08-13新增
-            if (connStrSetting == null)
+            if (connStrSetting == null || string.IsNullOrWhiteSpace(connStrSetting.ConnectionString))
             {
                 throw new Exception("数据库连接字符串【" + connStrName + "】没有配置！");
             }
-            string[] assAndClass = connStrSetting.ProviderName.Split(',');
-            if (assAndClass.Length > 1)
-            {
-                dbProvider = CreateDbProvider(assAndClass[0].Trim(), assAndClass[1].Trim(), connStrSetting.ConnectionString, null);
-            }
-            else
-            {
-                dbProvider = CreateDbProvider(null, assAndClass[0].Trim(), connStrSetting.ConnectionString, null);
-            }
+            var assAndClass = connStrSetting.ProviderName.Split(',');
+            var dbProvider = assAndClass.Length > 1 
+                ? CreateDbProvider(assAndClass[0].Trim(), assAndClass[1].Trim(), connStrSetting.ConnectionString, null) 
+                : CreateDbProvider(null, assAndClass[0].Trim(), connStrSetting.ConnectionString, null);
             dbProvider.ConnectionStringsName = connStrName;
             return dbProvider;
         }

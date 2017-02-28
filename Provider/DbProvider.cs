@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010/2/10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -230,23 +231,39 @@ namespace Dos.ORM
             {
                 if ("@?:".Contains(nameStr[0].ToString()))
                 {
-                    return nameStr.Substring(1).Insert(0, new string(paramPrefixToken, 1));
+                    nameStr = nameStr.Substring(1).Insert(0, new string(paramPrefixToken, 1));
                 }
-                else {
-                    return nameStr.Insert(0, new string(paramPrefixToken, 1));
+                else
+                {
+                    nameStr = nameStr.Insert(0, new string(paramPrefixToken, 1));
                 }
             }
-            return nameStr;
+            //剔除参数中的“.” 2016-04-08 added
+            return nameStr.Replace(".", "_");
         }
 
         /// <summary>
         /// Builds the name of the table.
         /// </summary>
         /// <param name="name">The name.</param>
+        /// <param name="userName">The name.</param>
         /// <returns></returns>
-        public virtual string BuildTableName(string name)
+        public virtual string BuildTableName(string name, string userName)
         {
-            return string.Concat(leftToken.ToString(), name.Trim(leftToken, rightToken), rightToken.ToString());
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return "";
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(userName))
+                {
+                    return string.Concat(leftToken.ToString(), name.Trim(leftToken, rightToken), rightToken.ToString());
+                }
+                return string.Concat(leftToken.ToString(), userName.Trim(leftToken, rightToken), rightToken.ToString())
+                    + "."
+                    + string.Concat(leftToken.ToString(), name.Trim(leftToken, rightToken), rightToken.ToString());
+            }
         }
 
 
@@ -263,8 +280,6 @@ namespace Dos.ORM
             Check.Require(endIndex, "endIndex", Check.GreaterThanOrEqual<int>(1));
             Check.Require(startIndex <= endIndex, "startIndex must be less than endIndex!");
             Check.Require(fromSection, "fromSection", Check.NotNullOrEmpty);
-
-
 
             int pageSize = endIndex - startIndex + 1;
             if (startIndex == 1)
@@ -285,8 +300,6 @@ namespace Dos.ORM
                         }
                     }
                 }
-
-
 
                 Check.Require(!OrderByClip.IsNullOrEmpty(fromSection.OrderByClip), "query.OrderByClip could not be null or empty!");
 
@@ -397,16 +410,16 @@ namespace Dos.ORM
 
             foreach (DbParameter p in cmd.Parameters)
             {
-                
+
                 if (!isStoredProcedure)
                 {
                     //TODO 这里可以继续优化
                     if (cmd.CommandText.IndexOf(p.ParameterName, StringComparison.Ordinal) == -1)
                     {
                         //2015-08-11修改
-                        cmd.CommandText = cmd.CommandText.Replace("@"+p.ParameterName.Substring(1), p.ParameterName);
-                        cmd.CommandText = cmd.CommandText.Replace("?"+p.ParameterName.Substring(1), p.ParameterName);
-                        cmd.CommandText = cmd.CommandText.Replace(":"+p.ParameterName.Substring(1), p.ParameterName);
+                        cmd.CommandText = cmd.CommandText.Replace("@" + p.ParameterName.Substring(1), p.ParameterName);
+                        cmd.CommandText = cmd.CommandText.Replace("?" + p.ParameterName.Substring(1), p.ParameterName);
+                        cmd.CommandText = cmd.CommandText.Replace(":" + p.ParameterName.Substring(1), p.ParameterName);
                         //if (p.ParameterName.Substring(0, 1) == "?" || p.ParameterName.Substring(0, 1) == ":"
                         //        || p.ParameterName.Substring(0, 1) == "@")
                         //    cmd.CommandText = cmd.CommandText.Replace(paramPrefixToken + p.ParameterName.Substring(1), p.ParameterName);

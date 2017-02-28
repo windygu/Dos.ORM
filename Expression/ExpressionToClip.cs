@@ -9,7 +9,7 @@
 * 创建日期：2015/5/10 10:54:32
 * 文件描述：
 ******************************************************
-* 修 改 人：
+* 修 改 人：ITdos
 * 修改日期：
 * 备注描述：
 *******************************************************/
@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -26,6 +27,10 @@ using Dos.ORM.Common;
 
 namespace Dos.ORM
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public static class ExpressionToClip<T>
     {
         private static Evaluator evaluator = new Evaluator();
@@ -34,59 +39,110 @@ namespace Dos.ORM
         /// <summary>
         /// 
         /// </summary>
-        public static WhereClip ToJoinWhere<TEntity>(Expression<Func<T, TEntity, bool>> expr)
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToJoinWhere<TEntity>(Expression<Func<T, TEntity, bool>> e)
         {
-            return ToWhereClipChild(expr.Body, WhereType.JoinWhere);
+            return ToWhereClipChild(e.Body, WhereType.JoinWhere);
         }
         /// <summary>
         /// 
         /// </summary>
-        public static WhereClip ToWhereClip(Expression<Func<T, bool>> expr)
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToWhereClip(Expression<Func<T, bool>> e)
         {
-            return ToWhereClipChild(expr.Body);
+            return ToWhereClipChild(e.Body);
         }
-        public static WhereClip ToWhereClip<T2>(Expression<Func<T, T2, bool>> expr)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToWhereClip<T2>(Expression<Func<T, T2, bool>> e)
         {
-            return ToWhereClipChild(expr.Body);
+            return ToWhereClipChild(e.Body);
         }
-        public static WhereClip ToWhereClip<T2, T3>(Expression<Func<T, T2, T3, bool>> expr)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToWhereClip<T2, T3>(Expression<Func<T, T2, T3, bool>> e)
         {
-            return ToWhereClipChild(expr.Body);
+            return ToWhereClipChild(e.Body);
         }
-        public static WhereClip ToWhereClip<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expr)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToWhereClip<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> e)
         {
-            return ToWhereClipChild(expr.Body);
+            return ToWhereClipChild(e.Body);
         }
-        public static WhereClip ToWhereClip<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expr)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToWhereClip<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> e)
         {
-            return ToWhereClipChild(expr.Body);
+            return ToWhereClipChild(e.Body);
         }
-        public static WhereClip ToWhereClip<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expr)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static WhereClip ToWhereClip<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> e)
         {
-            return ToWhereClipChild(expr.Body);
+            return ToWhereClipChild(e.Body);
         }
-        private static WhereClip ToWhereClipChild(System.Linq.Expressions.Expression exprBody, WhereType wtype = WhereType.Where)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="wt"></param>
+        /// <returns></returns>
+        private static WhereClip ToWhereClipChild(System.Linq.Expressions.Expression e, WhereType wt = WhereType.Where)
         {
-            if (exprBody is BinaryExpression)
+            if (e is BinaryExpression)
             {
-                return ConvertBinary((BinaryExpression)exprBody, wtype);
+                return ConvertBinary((BinaryExpression)e, wt);
             }
-            if (exprBody is MethodCallExpression)
+            if (e is MethodCallExpression)
             {
-                return ConvertMethodCall((MethodCallExpression)exprBody);
+                return ConvertMethodCall((MethodCallExpression)e);
             }
-            if (exprBody is UnaryExpression)
+            if (e is UnaryExpression)
             {
-                return ConvertUnary((UnaryExpression)exprBody);
+                return ConvertUnary((UnaryExpression)e);
             }
-            if (IsBoolFieldOrProperty(exprBody))
+            if (IsBoolFieldOrProperty(e))
             {
-                var key = ((MemberExpression)exprBody).Member.Name;
+                var key = ((MemberExpression)e).Member.Name;
                 return new WhereClip();
             }
-            if (exprBody is ConstantExpression)
+            if (e is ConstantExpression)
             {
-                var key = ((ConstantExpression)exprBody).Value;
+                var key = ((ConstantExpression)e).Value;
                 if (DataUtils.ConvertValue<bool>(key))
                 {
                     return new WhereClip(" 1=1 ");
@@ -95,157 +151,185 @@ namespace Dos.ORM
             }
             throw new Exception("暂时不支持的Where条件Lambda表达式写法！请使用经典写法！");
         }
-
-        private static bool IsBoolFieldOrProperty(System.Linq.Expressions.Expression expr)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static bool IsBoolFieldOrProperty(System.Linq.Expressions.Expression e)
         {
-            if (expr is MemberExpression)
-            {
-                var member = ((MemberExpression)expr);
-                if (member.Member.MemberType == MemberTypes.Field || member.Member.MemberType == MemberTypes.Property)
-                {
-                    if (member.Type == typeof(bool))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            if (!(e is MemberExpression)) return false;
+            var member = ((MemberExpression)e);
+            if (member.Member.MemberType != MemberTypes.Field && member.Member.MemberType != MemberTypes.Property)
+                return false;
+            return member.Type == typeof(bool);
         }
-
-        private static WhereClip ConvertUnary(UnaryExpression expr, WhereType wtype = WhereType.Where)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ue"></param>
+        /// <param name="wtype"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertUnary(UnaryExpression ue, WhereType wtype = WhereType.Where)
         {
-            switch (expr.NodeType)
+            switch (ue.NodeType)
             {
                 case ExpressionType.Not:
-                    return !ToWhereClipChild(expr.Operand, wtype);
+                    return !ToWhereClipChild(ue.Operand, wtype);
             }
-            throw new Exception("暂时不支持的NodeType(" + expr.NodeType + ") lambda写法！请使用经典写法！");
+            throw new Exception("暂时不支持的NodeType(" + ue.NodeType + ") lambda写法！请使用经典写法！");
         }
-
-        private static WhereClip ConvertBinary(BinaryExpression e, WhereType wtype = WhereType.Where)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="be"></param>
+        /// <param name="wt"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertBinary(BinaryExpression be, WhereType wt = WhereType.Where)
         {
-            switch (e.NodeType)
+            switch (be.NodeType)
             {
                 case ExpressionType.Equal:
-                    return LeftAndRight(e, QueryOperator.Equal, wtype);
+                    return LeftAndRight(be, QueryOperator.Equal, wt);
                 case ExpressionType.GreaterThan:
-                    return LeftAndRight(e, QueryOperator.Greater, wtype);
+                    return LeftAndRight(be, QueryOperator.Greater, wt);
                 case ExpressionType.GreaterThanOrEqual:
-                    return LeftAndRight(e, QueryOperator.GreaterOrEqual, wtype);
+                    return LeftAndRight(be, QueryOperator.GreaterOrEqual, wt);
                 case ExpressionType.LessThan:
-                    return LeftAndRight(e, QueryOperator.Less, wtype);
+                    return LeftAndRight(be, QueryOperator.Less, wt);
                 case ExpressionType.LessThanOrEqual:
-                    return LeftAndRight(e, QueryOperator.LessOrEqual, wtype);
+                    return LeftAndRight(be, QueryOperator.LessOrEqual, wt);
                 case ExpressionType.NotEqual:
-                    return LeftAndRight(e, QueryOperator.NotEqual, wtype);
+                    return LeftAndRight(be, QueryOperator.NotEqual, wt);
                 case ExpressionType.AndAlso:
-                    return ToWhereClipChild(e.Left, wtype) && ToWhereClipChild(e.Right, wtype);
+                    return ToWhereClipChild(be.Left, wt) && ToWhereClipChild(be.Right, wt);
                 case ExpressionType.OrElse:
-                    return ToWhereClipChild(e.Left, wtype) || ToWhereClipChild(e.Right, wtype);
+                    return ToWhereClipChild(be.Left, wt) || ToWhereClipChild(be.Right, wt);
                 default:
-                    throw new Exception("暂时不支持的Where条件(" + e.NodeType + ")Lambda表达式写法！请使用经典写法！");
+                    throw new Exception("暂时不支持的Where条件(" + be.NodeType + ")Lambda表达式写法！请使用经典写法！");
             }
         }
-
-        private static WhereClip ConvertMethodCall(MethodCallExpression e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mce"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertMethodCall(MethodCallExpression mce)
         {
-            switch (e.Method.Name)
+            switch (mce.Method.Name)
             {
                 case "StartsWith":
-                    return ConvertLikeCall(e, "", "%");
+                    return ConvertLikeCall(mce, "", "%");
                 case "EndsWith":
-                    return ConvertLikeCall(e, "%", "");
+                    return ConvertLikeCall(mce, "%", "");
                 case "Contains":
-                    return ConvertLikeCall(e, "%", "%");
+                    return ConvertLikeCall(mce, "%", "%");
                 case "Like":
-                    return ConvertLikeCall(e, "%", "%", true);
+                    return ConvertLikeCall(mce, "%", "%", true);
+                case "Equals":
+                    return ConvertEqualsCall(mce);
                 case "In":
-                    return ConvertInCall(e);
+                    return ConvertInCall(mce);
                 case "NotIn":
-                    return ConvertInCall(e, true);
+                    return ConvertInCall(mce, true);
                 case "IsNull":
-                    return ConvertNull(e, true);
+                    return ConvertNull(mce, true);
                 case "IsNotNull":
-                    return ConvertNull(e);
-                //case "Sum":
-                //    return ConvertAs(e);
+                    return ConvertNull(mce);
+                    //case "Sum":
+                    //    return ConvertAs(e);
             }
-            throw new Exception("暂时不支持的Lambda表达式方法: " + e.Method.Name + "！请使用经典写法！");
+            throw new Exception("暂时不支持的Lambda表达式方法: " + mce.Method.Name + "！请使用经典写法！");
         }
-
-        private static WhereClip ConvertNull(MethodCallExpression e, bool isNull = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mce"></param>
+        /// <param name="isNull"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertNull(MethodCallExpression mce, bool isNull = false)
         {
             ColumnFunction function;
             MemberExpression member;
-            string key = GetMemberName(e.Arguments[0], out function, out member);
-            if (isNull)
+            var key = GetMemberName(mce.Arguments[0], out function, out member);
+            return isNull ? CreateField(key, member.Expression.Type).IsNull()
+                : CreateField(key, member.Expression.Type).IsNotNull();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mce"></param>
+        /// <param name="isLike"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertEqualsCall(MethodCallExpression mce, bool isLike = false)
+        {
+            ColumnFunction function;
+            MemberExpression member;
+            var key = GetMemberName(mce.Object, out function, out member);
+            var value = GetValue(mce.Arguments[0]);
+            if (value != null)
             {
-                return new Field(key, member.Expression.Type.Name).IsNull();
+                return new WhereClip(CreateField(key, member.Expression.Type),
+                    string.Concat(value), QueryOperator.Equal);
             }
-            return new Field(key, member.Expression.Type.Name).IsNotNull();
+            throw new Exception("'Like'仅支持一个参数，参数应为字符串且不允许为空");
         }
-
-        private static WhereClip ConvertInCall(MethodCallExpression e, bool notIn = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mce"></param>
+        /// <param name="notIn"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertInCall(MethodCallExpression mce, bool notIn = false)
         {
             ColumnFunction function;
             MemberExpression member;
-            string key = GetMemberName(e.Arguments[0], out function, out member);
+            var key = GetMemberName(mce.Arguments[0], out function, out member);
             var list = new List<object>();
-            var ie = GetValue(e.Arguments[1]);
+            var ie = GetValue(mce.Arguments[1]);
             if (ie is IEnumerable)
             {
-                foreach (var obj in (IEnumerable)GetValue(e.Arguments[1]))
-                {
-                    list.Add(obj);
-                }
+                list.AddRange(((IEnumerable)GetValue(mce.Arguments[1])).Cast<object>());
             }
             else
             {
                 list.Add(ie);
             }
-            if (notIn)
-            {
-                return new Field(key, member.Expression.Type.Name).SelectNotIn(list.ToArray());
-            }
-            return new Field(key, member.Expression.Type.Name).SelectIn(list.ToArray());
+            return notIn ? CreateField(key, member.Expression.Type).SelectNotIn(list.ToArray())
+                : CreateField(key, member.Expression.Type).SelectIn(list.ToArray());
         }
-
-        private static WhereClip ConvertLikeCall(MethodCallExpression e, string left, string right, bool isLike = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mce"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <param name="isLike"></param>
+        /// <returns></returns>
+        private static WhereClip ConvertLikeCall(MethodCallExpression mce, string left, string right, bool isLike = false)
         {
             ColumnFunction function;
             MemberExpression member;
-            string key = GetMemberName(isLike ? e.Arguments[0] : e.Object, out function, out member);
-            if (isLike ? e.Arguments.Count == 2 : e.Arguments.Count == 1)
+            var key = GetMemberName(isLike ? mce.Arguments[0] : mce.Object, out function, out member);
+            if (isLike ? mce.Arguments.Count == 2 : mce.Arguments.Count == 1)
             {
-                object value = GetValue(isLike ? e.Arguments[1] : e.Arguments[0]);
+                var value = GetValue(isLike ? mce.Arguments[1] : mce.Arguments[0]);
                 if (value != null && value is string)
                 {
-                    return new WhereClip(new Field(key, member.Expression.Type.Name),
+                    return new WhereClip(CreateField(key, member.Expression.Type),
                         string.Concat(left, value, right), QueryOperator.Like);
                 }
             }
             throw new Exception("'Like'仅支持一个参数，参数应为字符串且不允许为空");
         }
-
-        private static string GetColumnName(MemberExpression expr)
-        {
-            string mn = expr.Member.Name;
-            if (expr.Expression is MemberExpression)
-            {
-                var m = (MemberExpression)expr.Expression;
-                if (mn == "Id")
-                {
-                    mn = m.Member.Name;
-                }
-                else
-                {
-                    mn = m.Member.Name + "$" + mn;
-                }
-            }
-            return mn;
-        }
-
-        public static string GetMemberName(System.Linq.Expressions.Expression expr, out ColumnFunction function, out MemberExpression obj)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <param name="function"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string[] GetMemberName(System.Linq.Expressions.Expression expr, out ColumnFunction function, out MemberExpression obj)
         {
             if (expr.NodeType == ExpressionType.Convert)
             {
@@ -255,7 +339,7 @@ namespace Dos.ORM
             {
                 function = ColumnFunction.None;
                 obj = (MemberExpression)expr;
-                return GetColumnName(obj);
+                return GetFieldName(obj.Member);
             }
             if (expr is MethodCallExpression)
             {
@@ -264,67 +348,57 @@ namespace Dos.ORM
                 {
                     function = ColumnFunction.ToLower;
                     obj = (MemberExpression)e.Object;
-                    return GetColumnName(obj);
+                    return GetFieldName(obj.Member);
                 }
                 if (e.Method.Name == "ToUpper" && e.Object is MemberExpression)
                 {
                     function = ColumnFunction.ToUpper;
                     obj = (MemberExpression)e.Object;
-                    return GetColumnName(obj);
+                    return GetFieldName(obj.Member);
                 }
-                //if (e.Method.Name == "Sum")
-                //{
-                //    return  e.Arguments.
-                //}
                 throw new Exception("暂时不支持的Lambda表达式写法！请使用经典写法！");
             }
             throw new Exception("暂时不支持的Lambda表达式写法！请使用经典写法！");
         }
-
-        private static WhereClip LeftAndRight(BinaryExpression e, QueryOperator co, WhereType wtype = WhereType.Where)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="be"></param>
+        /// <param name="co"></param>
+        /// <param name="wtype"></param>
+        /// <returns></returns>
+        private static WhereClip LeftAndRight(BinaryExpression be, QueryOperator co, WhereType wtype = WhereType.Where)
         {
             ColumnFunction leftFunction;
             ColumnFunction rightFunction;
             MemberExpression leftMe = null;
             MemberExpression rightMe;
-            System.Linq.Expressions.Expression expLeft = e.Left;
-            System.Linq.Expressions.Expression expRight = e.Right;
-            if (e.Left.NodeType == ExpressionType.Convert)
+            System.Linq.Expressions.Expression expLeft = be.Left;
+            System.Linq.Expressions.Expression expRight = be.Right;
+            if (be.Left.NodeType == ExpressionType.Convert)
             {
-                expLeft = ((UnaryExpression)e.Left).Operand;
+                expLeft = ((UnaryExpression)be.Left).Operand;
             }
-            if (e.Right.NodeType == ExpressionType.Convert)
+            if (be.Right.NodeType == ExpressionType.Convert)
             {
-                expRight = ((UnaryExpression)e.Right).Operand;
+                expRight = ((UnaryExpression)be.Right).Operand;
             }
-
-            //DebugInfoGenerator aa +=        ;
-            //System.Linq.Expressions.Expression.Lambda(expRight).Compile(debugInfoGenerator);
-
             var isAgain = false;
-        Again:
+            Again:
             if (expLeft.NodeType == ExpressionType.Constant
                 || (expLeft.NodeType == ExpressionType.MemberAccess && ((MemberExpression)expLeft).Expression == null) || isAgain)
             {
                 if (expRight.NodeType == ExpressionType.Constant ||
                     (expRight.NodeType == ExpressionType.MemberAccess && ((MemberExpression)expRight).Expression == null))
                 {
-                    //var leftValue = GetValue(expLeft);
-                    //var rightValue = GetValue(expRight);
-                    //if (leftValue.Equals(rightValue))
-                    //{
-                    //    return new WhereClip(" 1=1 ");
-                    //}
-                    if (DataUtils.ConvertValue<bool>(fastEvaluator.Eval(e)))
-                    {
-                        return new WhereClip(" 1=2 ");
-                    }
-                    return new WhereClip(" 1=1 ");
+                    return DataUtils.ConvertValue<bool>(fastEvaluator.Eval(be))
+                        ? new WhereClip(" 1=2 ")
+                        : new WhereClip(" 1=1 ");
                 }
                 else
                 {
                     var keyRightName = GetMemberName(expRight, out rightFunction, out rightMe);
-                    
+
                     if (expLeft.NodeType == ExpressionType.MemberAccess)
                     {
                         var left = (MemberExpression)expLeft;
@@ -332,47 +406,44 @@ namespace Dos.ORM
                         {
                             ColumnFunction functionLeft;
                             var keyLeft = GetMemberName(expLeft, out functionLeft, out left);
-                            if (keyRightName.Contains("$"))
+                            if (keyRightName[0].Contains("$"))
                             {
-                                return new WhereClip(new Field(keyLeft, left.Expression.Type.Name), GetValue(expRight), co);
+                                return new WhereClip(CreateField(keyLeft, left.Expression.Type), GetValue(expRight), co);
                             }
                             else
                             {
-                                return new WhereClip(new Field(keyRightName, rightMe.Expression.Type.Name), new Field(keyLeft, left.Expression.Type.Name), co);
+                                return new WhereClip(CreateField(keyRightName, rightMe.Expression.Type), CreateField(keyLeft, left.Expression.Type), co);
                             }
                         }
                     }
                     object value = GetValue(expLeft);
-                    if (keyRightName.Contains("$"))
+                    if (keyRightName[0].Contains("$"))
                     {
-                        if (DataUtils.ConvertValue<bool>(fastEvaluator.Eval(e)))
+                        if (DataUtils.ConvertValue<bool>(fastEvaluator.Eval(be)))
                         {
                             return new WhereClip(" 1=2 ");
                         }
                         return new WhereClip(" 1=1 ");
                     }
-                    if (value == null)
+                    if (value != null)
+                        return new WhereClip(CreateField(keyRightName, rightMe.Expression.Type), value, co);
+                    switch (co)
                     {
-                        if (co == QueryOperator.Equal)
-                        {
-                            return new Field(keyRightName, rightMe.Expression.Type.Name).IsNull();
-                        }
-                        if (co == QueryOperator.NotEqual)
-                        {
-                            return new Field(keyRightName, rightMe.Expression.Type.Name).IsNotNull();
-                        }
-                        throw new Exception("null值只支持等于或不等于！");
+                        case QueryOperator.Equal:
+                            return CreateField(keyRightName, rightMe.Expression.Type).IsNull();
+                        case QueryOperator.NotEqual:
+                            return CreateField(keyRightName, rightMe.Expression.Type).IsNotNull();
                     }
-                    return new WhereClip(new Field(keyRightName, rightMe.Expression.Type.Name), value, co);
+                    throw new Exception("null值只支持等于或不等于！出错比较符：" + co.ToString());
                 }
             }
             else
             {
-                var key = "";
+                string[] key;
                 try
                 {
                     key = GetMemberName(expLeft, out leftFunction, out leftMe);
-                    if (key.Contains("$"))
+                    if (key[0].Contains("$"))
                     {
                         isAgain = true;
                         goto Again;
@@ -390,7 +461,10 @@ namespace Dos.ORM
                     {
                         ColumnFunction functionRight;
                         var keyRight = GetMemberName(expRight, out functionRight, out right);
-                        return new WhereClip(new Field(key, leftMe.Expression.Type.Name), new Field(keyRight, right.Expression.Type.Name), co);
+                        return new WhereClip(
+                            CreateField(key, leftMe.Expression.Type),
+                            CreateField(keyRight, right.Expression.Type)
+                            , co);
                     }
                 }
                 object value = GetValue(expRight);
@@ -398,89 +472,101 @@ namespace Dos.ORM
                 {
                     if (co == QueryOperator.Equal)
                     {
-                        return new Field(key, leftMe.Expression.Type.Name).IsNull();
+                        return CreateField(key, leftMe.Expression.Type).IsNull();
                     }
                     if (co == QueryOperator.NotEqual)
                     {
-                        return new Field(key, leftMe.Expression.Type.Name).IsNotNull();
+                        return CreateField(key, leftMe.Expression.Type).IsNotNull();
                     }
                     throw new Exception("null值只支持等于或不等于！");
                 }
-                return new WhereClip(new Field(key, leftMe.Expression.Type.Name), value, co);
+                return new WhereClip(CreateField(key, leftMe.Expression.Type), value, co);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="right"></param>
+        /// <returns></returns>
         private static object GetValue(System.Linq.Expressions.Expression right)
         {
             return fastEvaluator.Eval(right);
-            //object value
-            //    = right.NodeType == ExpressionType.Constant
-            //          ? ((ConstantExpression)right).Value
-            //          : System.Linq.Expressions.Expression.Lambda(right).Compile().DynamicInvoke();
-            //return value;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static GroupByClip ToGroupByClip(Expression<Func<T, object>> expr)
         {
             return ToGroupByClipChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exprBody"></param>
+        /// <returns></returns>
         private static GroupByClip ToGroupByClipChild(System.Linq.Expressions.Expression exprBody)
         {
             if (exprBody is MemberExpression)
             {
                 var e = (MemberExpression)exprBody;
-                return new GroupByClip(new Field(e.Member.Name, e.Expression.Type.Name));
+                var filedProp = GetFieldName(e.Member);
+                return new GroupByClip(CreateField(filedProp, e.Expression.Type));
             }
             if (exprBody is NewExpression)
             {
                 var exNew = (NewExpression)exprBody;
                 var type = exNew.Constructor.DeclaringType;
                 var list = new List<string>(exNew.Arguments.Count);
-                GroupByClip gb = GroupByClip.None;
-                foreach (MemberExpression member in exNew.Arguments)
-                {
-                    gb = gb && new Field(member.Member.Name, member.Expression.Type.Name).GroupBy;
-                }
-                return gb;
+                return exNew.Arguments.Cast<MemberExpression>().Aggregate(GroupByClip.None, (current, member)
+                    => current && CreateField(GetFieldName(member.Member), member.Expression.Type).GroupBy);
             }
             if (exprBody is UnaryExpression)
             {
                 var exNew = (UnaryExpression)exprBody;
                 return ToGroupByClipChild(exNew.Operand);
-                //var type = exNew.Constructor.DeclaringType;
-                //var list = new List<string>(exNew.Arguments.Count);
-                //GroupByClip gb = GroupByClip.None;
-                //foreach (MemberExpression member in exNew.Arguments)
-                //{
-                //    gb = gb && new Field(member.Member.Name, member.Expression.Type.Name).GroupBy;
-                //}
-                //return gb;
             }
-            
+
             throw new Exception("暂时不支持的Group by lambda写法！请使用经典写法！");
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static OrderByClip ToOrderByClip(Expression<Func<T, object>> expr)
         {
             return ToOrderByClipChild(expr.Body, OrderByOperater.ASC);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static OrderByClip ToOrderByDescendingClip(Expression<Func<T, object>> expr)
         {
             return ToOrderByClipChild(expr.Body, OrderByOperater.DESC);
-        }
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exprBody"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
         private static OrderByClip ToOrderByClipChild(System.Linq.Expressions.Expression exprBody, OrderByOperater orderBy)
         {
             if (exprBody is MemberExpression)
             {
                 var e = (MemberExpression)exprBody;
                 OrderByClip gb = OrderByClip.None;
+                var filedProp = GetFieldName(e.Member);
                 if (orderBy == OrderByOperater.DESC)
                 {
-                    gb = gb && new Field(e.Member.Name, e.Expression.Type.Name).Desc;
+                    gb = gb && CreateField(filedProp, e.Expression.Type).Desc;
                 }
                 else
                 {
-                    gb = gb && new Field(e.Member.Name, e.Expression.Type.Name).Asc;
+                    gb = gb && CreateField(filedProp, e.Expression.Type).Asc;
                 }
                 return gb;
             }
@@ -492,13 +578,14 @@ namespace Dos.ORM
                 OrderByClip gb = OrderByClip.None;
                 foreach (MemberExpression member in exNew.Arguments)
                 {
+                    var filedProp = GetFieldName(member.Member);
                     if (orderBy == OrderByOperater.DESC)
                     {
-                        gb = gb && new Field(member.Member.Name, member.Expression.Type.Name).Desc;
+                        gb = gb && CreateField(filedProp, member.Expression.Type).Desc;
                     }
                     else
                     {
-                        gb = gb && new Field(member.Member.Name, member.Expression.Type.Name).Asc;
+                        gb = gb && CreateField(filedProp, member.Expression.Type).Asc;
                     }
                 }
                 return gb;
@@ -510,41 +597,96 @@ namespace Dos.ORM
             }
             throw new Exception("暂时不支持的Order by lambda写法！请使用经典写法！");
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect(Expression<Func<T, object>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect<T2>(Expression<Func<T, T2, object>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect<T2, T3>(Expression<Func<T, T2, T3, object>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect<T2, T3, T4>(Expression<Func<T, T2, T3, T4, object>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, object>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, object>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         public static Field[] ToSelect(Expression<Func<T, bool>> expr)
         {
             return ToSelectChild(expr.Body);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exprBody"></param>
+        /// <returns></returns>
         private static Field[] ToSelectChild(System.Linq.Expressions.Expression exprBody)
         {
             if (exprBody is MemberExpression)
             {
                 var e = (MemberExpression)exprBody;
-                return new[] { new Field(e.Member.Name, e.Expression.Type.Name) };
+                var filedProp = GetFieldName(e.Member);
+                return new[] { CreateField(filedProp, e.Expression.Type) };
             }
             if (exprBody is MethodCallExpression)
             {
@@ -565,9 +707,32 @@ namespace Dos.ORM
                 var list = new List<string>(exNew.Arguments.Count);
                 var f = new Field[exNew.Arguments.Count];
                 var i = 0;
-                foreach (MemberExpression member in exNew.Arguments)
+                foreach (var item in exNew.Arguments)
                 {
-                    f[i] = new Field(member.Member.Name, member.Expression.Type.Name);
+                    var aliasName = exNew.Members[i].Name;
+
+                    if (item is MemberExpression)
+                    {
+                        var member = (MemberExpression)item;
+                        var filedProp = GetFieldName(member.Member);
+                        if (aliasName == "All")
+                        {
+                            f[i] = new Field("*", GetTableName(member.Expression.Type));
+                        }
+                        else if ((filedProp[0] == filedProp[1] && filedProp[0] != aliasName) || (filedProp[0] != aliasName && filedProp[1] != aliasName))
+                        {
+                            f[i] = CreateField(filedProp, member.Expression.Type, aliasName);
+                        }
+                        else
+                        {
+                            f[i] = CreateField(filedProp, member.Expression.Type);
+                        }
+                    }
+                    else if (item is MethodCallExpression)
+                    {
+                        var member = (MethodCallExpression)item;
+                        f[i] = ConvertFun(member, aliasName)[0];
+                    }
                     i++;
                 }
                 return f;
@@ -582,37 +747,107 @@ namespace Dos.ORM
                 }
             }
             throw new Exception("暂时不支持的Select lambda写法！请使用经典写法！");
-        }
-        private static Field[] ConvertFun(MethodCallExpression e)
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="aliasName"></param>
+        /// <returns></returns>
+        private static Field[] ConvertFun(MethodCallExpression e, string aliasName = null)
         {
             ColumnFunction function;
             MemberExpression member;
-            string key = GetMemberName(e.Arguments[0], out function, out member);
+            var key = GetMemberName(e.Arguments[0], out function, out member);
+            Field f;
+            f = string.IsNullOrWhiteSpace(aliasName)
+                ? CreateField(key, member.Expression.Type)
+                : CreateField(key, member.Expression.Type, aliasName);
             switch (e.Method.Name)
             {
                 case "Sum":
-                    return new[] { new Field(key, member.Expression.Type.Name).Sum() };
+                    return new[] { f.Sum() };
                 case "Avg":
-                    return new[] { new Field(key, member.Expression.Type.Name).Avg() };
+                    return new[] { f.Avg() };
                 case "Len":
-                    return new[] { new Field(key, member.Expression.Type.Name).Len() };
+                    return new[] { f.Len() };
+                case "Count":
+                    return new[] { f.Count() };
+                default:
+                    throw new Exception("暂时不支持的Lambda表达式写法(" + e.Method.Name + ")！请使用经典写法！");
             }
-            throw new Exception("暂时不支持的Lambda表达式写法(" + e.Method.Name + ")！请使用经典写法！");
-        }
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private static Field[] ConvertAs(MethodCallExpression e)
         {
             ColumnFunction function;
             MemberExpression member;
-            string key = GetMemberName(e.Arguments[0], out function, out member);
+            string[] key = GetMemberName(e.Arguments[0], out function, out member);
             if (e.Arguments.Count == 2)
             {
                 object value = GetValue(e.Arguments[1]);
                 if (value != null && value is string)
                 {
-                    return new[] { new Field(key, member.Expression.Type.Name) { AliasName = value.ToString() } };
+                    return new[] { CreateField(key, member.Expression.Type, value.ToString()) };
                 }
             }
             throw new Exception("'As'仅支持一个参数，参数应为字符串且不允许为空");
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static string GetTableName(Type type)
+        {
+            var tbl = type.GetCustomAttribute<Table>(false);
+            return tbl != null ? tbl.GetTableName() : type.Name;
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static string[] GetFieldName(MemberInfo type)
+        {
+            var tbl = type.GetCustomAttribute<FieldAttribute>(false);
+            return new string[] { tbl != null ? tbl.Field : type.Name, type.Name };
+            //return tbl != null ? tbl.Field : type.Name;
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mi"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private static Field CreateField(MemberInfo mi, Type t)
+        {
+            var filedProp = GetFieldName(mi);
+            return new Field(filedProp[0], GetTableName(t), null, null, null, filedProp[1] == filedProp[0] ? null : filedProp[1]);
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filedProp"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private static Field CreateField(string[] filedProp, Type t)
+        {
+            if (filedProp[0] == "All")
+            {
+                filedProp[0] = "*";
+            }
+            return new Field(filedProp[0], GetTableName(t));
+            //return new Field(filedProp[0], GetTableName(t), null, null, null, filedProp[1] == filedProp[0] ? null : filedProp[1]);
+        }/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filedProp"></param>
+        /// <param name="t"></param>
+        /// <param name="asName"></param>
+        /// <returns></returns>
+        private static Field CreateField(string[] filedProp, Type t, string asName)
+        {
+            return new Field(filedProp[0], GetTableName(t), null, null, null, asName);
         }
     }
 }

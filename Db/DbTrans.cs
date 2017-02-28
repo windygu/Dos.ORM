@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010-2-10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -206,7 +207,16 @@ namespace Dos.ORM
         {
             return new FromSection<TEntity>(dbSession.Db, trans);
         }
-
+        /// <summary>
+        /// 查询
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <returns></returns>
+        public FromSection<TEntity> From<TEntity>(string asName)
+            where TEntity : Entity
+        {
+            return new FromSection<TEntity>(dbSession.Db, trans, asName);
+        }
 
         /// <summary>
         /// 查询
@@ -215,10 +225,8 @@ namespace Dos.ORM
         /// <returns></returns>
         public FromSection From(string tableName)
         {
-            return new FromSection(dbSession.Db, tableName, trans);
+            return new FromSection(dbSession.Db, tableName,"", trans);
         }
-
-
         #endregion
 
 
@@ -298,6 +306,16 @@ namespace Dos.ORM
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="entities"></param>
         public int Update<TEntity>(IEnumerable<TEntity> entities)
+            where TEntity : Entity
+        {
+            return dbSession.Update<TEntity>(trans, entities.ToArray());
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entities"></param>
+        public int Update<TEntity>(List<TEntity> entities)
             where TEntity : Entity
         {
             return dbSession.Update<TEntity>(trans, entities.ToArray());
@@ -481,6 +499,26 @@ namespace Dos.ORM
         {
             return dbSession.Delete<TEntity>(trans,entity);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entities"></param>
+        public int Delete<TEntity>(IEnumerable<TEntity> entities)
+            where TEntity : Entity
+        {
+            return dbSession.Delete<TEntity>(trans, entities);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entities"></param>
+        public int Delete<TEntity>(List<TEntity> entities)
+            where TEntity : Entity
+        {
+            return dbSession.Delete<TEntity>(trans, entities);
+        }
         ///// <summary>
         /////  删除
         ///// </summary>
@@ -565,7 +603,7 @@ namespace Dos.ORM
         public int Insert<TEntity>(params TEntity[] entities)
             where TEntity : Entity
         {
-            return dbSession.Insert<TEntity>(entities);
+            return dbSession.Insert<TEntity>(trans,entities);
         }
         /// <summary>
         /// 
@@ -575,7 +613,17 @@ namespace Dos.ORM
         public int Insert<TEntity>(IEnumerable<TEntity> entities)
             where TEntity : Entity
         {
-            return dbSession.Insert<TEntity>(entities);
+            return dbSession.Insert<TEntity>(trans, entities);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entities"></param>
+        public int Insert<TEntity>(List<TEntity> entities)
+            where TEntity : Entity
+        {
+            return dbSession.Insert<TEntity>(trans, entities);
         }
         /// <summary>
         /// 添加

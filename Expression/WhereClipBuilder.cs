@@ -9,7 +9,7 @@
 * 创建日期：2015/6/3 10:54:32
 * 文件描述：
 ******************************************************
-* 修 改 人：
+* 修 改 人：ITdos
 * 修改日期：
 * 备注描述：
 *******************************************************/
@@ -111,7 +111,7 @@ namespace Dos.ORM
     /// <summary>
     /// Where条件拼接，同Where类
     /// </summary>
-    [Obsolete("建议使用Where类替代WhereClip类。使用示例：var W = new Where<T>(); W.And(d=>d.ID == 1);")]
+    //[Obsolete("建议使用Where类替代WhereClip类。使用示例：var W = new Where<T>(); W.And(d=>d.ID == 1);")]
     public class WhereClipBuilder<T> : WhereClipBuilder
         where T : Entity
     {

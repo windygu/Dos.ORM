@@ -1,21 +1,23 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010-2-10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -28,11 +30,11 @@ using Dos.ORM;
 namespace Dos.ORM.Common
 {
     /// <summary>
-    /// 此类占位用，以兼容以前代码不会报错。
+    /// 此类占位用，以兼容以前代码"using Dos.ORM.Common;"不会报错。
     /// </summary>
     public class DosORMCommon
     {
-        
+
     }
 }
 
@@ -449,7 +451,7 @@ namespace Dos.ORM
         /// <returns></returns>
         public static int GetNewParamCount()
         {
-            if (paramCount > 999999)
+            if (paramCount >= 9999)
             {
                 paramCount = 0;
             }
@@ -463,19 +465,18 @@ namespace Dos.ORM
         /// <returns></returns>
         public static string MakeUniqueKey(Field field)//string prefix,
         {
-            //paramPrefixToken
-            //return GetRandomNumber().ToString();
             //TODO 此处应该根据数据库类型来附加@、?、:
-            //2015-08-10，去掉了第一个"@", 
-            return string.Concat("@", field.tableName, "_", field.Name, "_", GetNewParamCount());
-            byte[] data = new byte[16];
-            new RNGCryptoServiceProvider().GetBytes(data);
-            string keystring = keyReg.Replace(Convert.ToBase64String(data).Trim(), string.Empty);
+            //return string.Concat("@", field.tableName, "_", field.Name, "_", GetNewParamCount()).Replace(".","_");
+            //如遇Oracle超过30字符Bug，把field.tableName去掉即可
+            return string.Concat("@", field.Name, GetNewParamCount());
+            //byte[] data = new byte[16];
+            //new RNGCryptoServiceProvider().GetBytes(data);
+            //string keystring = keyReg.Replace(Convert.ToBase64String(data).Trim(), string.Empty);
 
-            if (keystring.Length > 16)
-                return keystring.Substring(0, 16).ToLower();
+            //if (keystring.Length > 16)
+            //    return keystring.Substring(0, 16).ToLower();
 
-            return keystring.ToLower();
+            //return keystring.ToLower();
 
             //return string.Concat(prefix, Guid.NewGuid().ToString().Replace("-", ""));
         }
@@ -490,17 +491,16 @@ namespace Dos.ORM
         {
             WhereClip where = new WhereClip();
 
-            Field[] keyfields = entity.GetPrimaryKeyFields();
-            Field[] allfields = entity.GetFields();
-            object[] allValues = entity.GetValues();
-            int fieldlength = allfields.Length;
+            var keyfields = entity.GetPrimaryKeyFields();
+            var allfields = entity.GetFields();
+            var allValues = entity.GetValues();
+            var fieldlength = allfields.Length;
             if (keyfields == null) return where;
-
-            foreach (Field pkField in keyfields)
+            foreach (var pkField in keyfields)
             {
                 for (int i = 0; i < fieldlength; i++)
                 {
-                    if (string.Compare(allfields[i].PropertyName, pkField.PropertyName, true) == 0)
+                    if (string.Compare(allfields[i].PropertyName, pkField.PropertyName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         where = where.And(new WhereClip(pkField, allValues[i], QueryOperator.Equal));
                         break;
@@ -508,11 +508,8 @@ namespace Dos.ORM
                 }
 
             }
-
             return where;
         }
-
-
         /// <summary>
         /// 生成主键条件
         /// </summary>
@@ -525,7 +522,7 @@ namespace Dos.ORM
             WhereClip where = new WhereClip();
             Field[] keyfields = EntityCache.GetPrimaryKeyFields<TEntity>();
 
-            if (keyfields == null) 
+            if (keyfields == null)
                 return where;
 
             Check.Require(keyfields.Length == pkValues.Length, "主键列与主键值无法对应!");
@@ -533,7 +530,7 @@ namespace Dos.ORM
             int index = keyfields.Length;
             for (int i = 0; i < index; i++)
             {
-                where = where.And(new WhereClip(keyfields[i], pkValues.GetValue(i), QueryOperator.Equal)); 
+                where = where.And(new WhereClip(keyfields[i], pkValues.GetValue(i), QueryOperator.Equal));
                 //2015-08-20注释
                 //where = where.And(new WhereClip(keyfields[i], pkValues[i], QueryOperator.Equal)); 
                 //where = where.And(keyfields[i].In(pkValues));//2015-06-09
@@ -685,6 +682,21 @@ namespace Dos.ORM
                     return 0;
                 }
             }
+            public static ushort ToUInt16(object value)
+            {
+                if (value is ushort)
+                {
+                    return (ushort)value;
+                }
+                try
+                {
+                    return Convert.ToUInt16(value);
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
             public static int ToInt32(object value)
             {
                 if (value is int)
@@ -700,6 +712,21 @@ namespace Dos.ORM
                     return 0;
                 }
             }
+            public static uint ToUInt32(object value)
+            {
+                if (value is uint)
+                {
+                    return (uint)value;
+                }
+                try
+                {
+                    return Convert.ToUInt32(value);
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
             public static long ToInt64(object value)
             {
                 if (value is long)
@@ -709,6 +736,21 @@ namespace Dos.ORM
                 try
                 {
                     return Convert.ToInt64(value);
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            public static ulong ToUInt64(object value)
+            {
+                if (value is long)
+                {
+                    return (ulong)value;
+                }
+                try
+                {
+                    return Convert.ToUInt64(value);
                 }
                 catch
                 {
@@ -840,6 +882,21 @@ namespace Dos.ORM
                     return new Nullable<short>();
                 }
             }
+            public static Nullable<ushort> ToNUInt16(object value)
+            {
+                if (value is ushort)
+                {
+                    return new Nullable<ushort>((ushort)value);
+                }
+                try
+                {
+                    return new Nullable<ushort>(Convert.ToUInt16(value));
+                }
+                catch
+                {
+                    return new Nullable<ushort>();
+                }
+            }
             public static Nullable<int> ToNInt32(object value)
             {
                 if (value is int)
@@ -855,6 +912,21 @@ namespace Dos.ORM
                     return new Nullable<int>();
                 }
             }
+            public static Nullable<uint> ToNUInt32(object value)
+            {
+                if (value is uint)
+                {
+                    return new Nullable<uint>((uint)value);
+                }
+                try
+                {
+                    return new Nullable<uint>(Convert.ToUInt32(value));
+                }
+                catch
+                {
+                    return new Nullable<uint>();
+                }
+            }
             public static Nullable<long> ToNInt64(object value)
             {
                 if (value is long)
@@ -868,6 +940,21 @@ namespace Dos.ORM
                 catch
                 {
                     return new Nullable<long>();
+                }
+            }
+            public static Nullable<ulong> ToNUInt64(object value)
+            {
+                if (value is long)
+                {
+                    return new Nullable<ulong>((ulong)value);
+                }
+                try
+                {
+                    return new Nullable<ulong>(Convert.ToUInt64(value));
+                }
+                catch
+                {
+                    return new Nullable<ulong>();
                 }
             }
             public static Nullable<bool> ToNBoolean(object value)
@@ -961,6 +1048,100 @@ namespace Dos.ORM
                 }
             }
         }
+        private static T ConvertObj<T>(dynamic obj)
+        {
+            return (T)obj;
+        }
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("此方法仅供内部使用", false)]
+        public static char ReadChar(object value)
+        {
+            if (value == null || value is DBNull) throw new ArgumentNullException("value");
+            string s = value as string;
+            if (s == null || s.Length != 1) throw new ArgumentException("A single-character was expected", "value");
+            return s[0];
+        }
+        /// <summary>
+        /// Internal use only
+        /// </summary>
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method is for internal usage only", false)]
+        public static char? ReadNullableChar(object value)
+        {
+            if (value == null || value is DBNull) return null;
+            string s = value as string;
+            if (s == null || s.Length != 1) throw new ArgumentException("A single-character was expected", "value");
+            return s[0];
+        }
+        /// <summary>
+        /// Throws a data exception, only used internally
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="index"></param>
+        /// <param name="reader"></param>
+        public static void ThrowDataException(Exception ex, int index, IDataReader reader)
+        {
+            string name = "(n/a)", value = "(n/a)";
+            if (reader != null && index >= 0 && index < reader.FieldCount)
+            {
+                name = reader.GetName(index);
+                object val = reader.GetValue(index);
+                if (val == null || val is DBNull)
+                {
+                    value = "<null>";
+                }
+                else
+                {
+                    value = Convert.ToString(val) + " - " + Type.GetTypeCode(val.GetType());
+                }
+            }
+            if (!(index >= reader.FieldCount))
+            {
+                throw new DataException(string.Format("Error parsing column {0} ({1}={2})", index, name, value), ex);
+            }
+        }
+    }
 
+    public static class DosORMCommonExpand
+    {
+        private static Dictionary<MemberInfo, Object> _micache1 = new Dictionary<MemberInfo, Object>();
+        private static Dictionary<MemberInfo, Object> _micache2 = new Dictionary<MemberInfo, Object>();
+        /// <summary>
+        /// 获取自定义特性，带有缓存功能，避免因.Net内部GetCustomAttributes没有缓存而带来的损耗
+        /// </summary>
+        /// <typeparam name="TAttribute"></typeparam>
+        /// <param name="member"></param>
+        /// <param name="inherit"></param>
+        /// <returns></returns>
+        public static TAttribute[] GetCustomAttributes<TAttribute>(this MemberInfo member, Boolean inherit)
+        {
+            if (member == null) return new TAttribute[0];
+
+            // 根据是否可继承，分属两个缓存集合
+            var cache = inherit ? _micache1 : _micache2;
+
+            Object obj = null;
+            if (cache.TryGetValue(member, out obj)) return (TAttribute[])obj;
+            lock (cache)
+            {
+                if (cache.TryGetValue(member, out obj)) return (TAttribute[])obj;
+
+                var atts = member.GetCustomAttributes(typeof(TAttribute), inherit) as TAttribute[];
+                var att = atts == null ? new TAttribute[0] : atts;
+                cache[member] = att;
+                return att;
+            }
+        }
+        /// <summary>获取自定义属性</summary>
+        /// <typeparam name="TAttribute"></typeparam>
+        /// <param name="member"></param>
+        /// <param name="inherit"></param>
+        /// <returns></returns>
+        public static TAttribute GetCustomAttribute<TAttribute>(this MemberInfo member, Boolean inherit)
+        {
+            var atts = member.GetCustomAttributes<TAttribute>(inherit);
+            if (atts == null || atts.Length < 1) return default(TAttribute);
+            return atts[0];
+        }
     }
 }

@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010-2-10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -178,10 +179,10 @@ namespace Dos.ORM
         public void Update<TEntity>(TEntity entity)
             where TEntity : Entity
         {
-            if (entity.GetModifyFields().Count == 0)
+            if (!entity.IsModify())
                 return;
 
-            WhereClip where = DataUtils.GetPrimaryKeyWhere(entity);
+            var where = DataUtils.GetPrimaryKeyWhere(entity);
 
             Check.Require(!WhereClip.IsNullOrEmpty(where), "entity must have the primarykey!");
 
@@ -199,7 +200,7 @@ namespace Dos.ORM
         public void Update<TEntity>(TEntity entity, WhereClip where)
             where TEntity : Entity
         {
-            if (entity.GetModifyFields().Count == 0)
+            if (!entity.IsModify())
                 return;
 
             batchcmd.Process(cmdCreator.CreateUpdateCommand<TEntity>(entity, where));
@@ -326,7 +327,7 @@ namespace Dos.ORM
         {
             Check.Require(!EntityCache.IsReadOnly<TEntity>(), string.Concat("Entity(", EntityCache.GetTableName<TEntity>(), ") is readonly!"));
 
-            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
+            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), EntityCache.GetUserName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
         }
         /// <summary>
         ///  删除
@@ -339,7 +340,7 @@ namespace Dos.ORM
         {
             Check.Require(!EntityCache.IsReadOnly<TEntity>(), string.Concat("Entity(", EntityCache.GetTableName<TEntity>(), ") is readonly!"));
 
-            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
+            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), EntityCache.GetUserName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
         }
         /// <summary>
         ///  删除
@@ -352,7 +353,7 @@ namespace Dos.ORM
         {
             Check.Require(!EntityCache.IsReadOnly<TEntity>(), string.Concat("Entity(", EntityCache.GetTableName<TEntity>(), ") is readonly!"));
 
-            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
+            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), EntityCache.GetUserName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
         }
         /// <summary>
         ///  删除
@@ -365,7 +366,7 @@ namespace Dos.ORM
         {
             Check.Require(!EntityCache.IsReadOnly<TEntity>(), string.Concat("Entity(", EntityCache.GetTableName<TEntity>(), ") is readonly!"));
 
-            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
+            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), EntityCache.GetUserName<TEntity>(), DataUtils.GetPrimaryKeyWhere<TEntity>(pkValues.ToArray())));
         }
         /// <summary>
         ///  删除
@@ -378,7 +379,7 @@ namespace Dos.ORM
         {
             Check.Require(!EntityCache.IsReadOnly<TEntity>(), string.Concat("Entity(", EntityCache.GetTableName<TEntity>(), ") is readonly!"));
 
-            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), where));
+            batchcmd.Process(cmdCreator.CreateDeleteCommand(EntityCache.GetTableName<TEntity>(), EntityCache.GetUserName<TEntity>(), where));
         }
 
         #endregion

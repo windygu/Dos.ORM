@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010/2/10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -61,7 +62,8 @@ namespace Dos.ORM.SqlServer
             {
                 return nameStr.Insert(0, new string(paramPrefixToken, 1));
             }
-            return nameStr;
+            //剔除参数中的“.” 2016-04-08 added
+            return nameStr.Replace(".", "_");
         }
 
 

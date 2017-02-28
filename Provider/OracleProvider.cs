@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010/2/10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -156,6 +157,11 @@ namespace Dos.ORM.Oracle
                         break;
                     case DbType.Object:
                         oracleParam.OracleType = OracleType.NClob;
+                        p.Value = SerializationManager.Serialize(value);
+                        break;
+                    //2015-12-31  新增
+                    case DbType.Guid:
+                        oracleParam.OracleType = OracleType.Char;//AnsiStringFixedLength  
                         p.Value = SerializationManager.Serialize(value);
                         break;
                 }

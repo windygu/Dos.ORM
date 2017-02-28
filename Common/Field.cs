@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010-2-10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -140,7 +141,11 @@ namespace Dos.ORM
         /// 所有字段   就是  *  
         /// </summary>
         public static readonly Field All = new Field("*");
-
+        
+        /// <summary>
+        /// 值 
+        /// </summary>
+        //public object value;//2016-02-02新增
         #endregion
 
         #region 属性
@@ -740,11 +745,11 @@ namespace Dos.ORM
             Check.Require((null != values && values.Length > 0),
                 "values could not be null or empty");
 
-            StringBuilder whereString = new StringBuilder(field.TableFieldName);
+            var whereString = new StringBuilder(field.TableFieldName);
             whereString.Append(join);
             whereString.Append("(");
-            List<Parameter> ps = new List<Parameter>();
-            StringBuilder inWhere = new StringBuilder();
+            var ps = new List<Parameter>();
+            var inWhere = new StringBuilder();
             var i = 0;
             foreach (T value in values)
             {
@@ -763,20 +768,15 @@ namespace Dos.ORM
                     if (value == null)
                         continue;
 
-
                     paraName = value.ToString();
-
 
                     if (string.IsNullOrEmpty(paraName))
                         continue;
 
                 }
 
-
                 inWhere.Append(",");
                 inWhere.Append(paraName);
-
-
             }
             whereString.Append(inWhere.ToString().Substring(1));
             whereString.Append(")");
@@ -963,9 +963,9 @@ namespace Dos.ORM
                 return null;
             if (from.DbProvider.DatabaseType == DatabaseType.MySql)
             {
-                return new WhereClip(string.Concat(field.TableFieldName, join, "(SELECT * FROM (", from.getPagedFromSection().SqlString, ") AS TEMP" + DataUtils.GetNewParamCount() + ")"), from.Parameters.ToArray());
+                return new WhereClip(string.Concat(field.TableFieldName, join, "(SELECT * FROM (", from.GetPagedFromSection().SqlString, ") AS TEMP" + DataUtils.GetNewParamCount() + ")"), from.Parameters.ToArray());
             }
-            return new WhereClip(string.Concat(field.TableFieldName, join, "(", from.getPagedFromSection().SqlString, ")"), from.Parameters.ToArray());
+            return new WhereClip(string.Concat(field.TableFieldName, join, "(", from.GetPagedFromSection().SqlString, ")"), from.Parameters.ToArray());
         }
 
         /// <summary>
@@ -1064,92 +1064,189 @@ namespace Dos.ORM
         #region 操作符重载
 
         #region WhereClip
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftField"></param>
+        /// <param name="rightField"></param>
+        /// <returns></returns>
         public static WhereClip operator ==(Field leftField, Field rightField)
         {
             return createWhereClip(leftField, rightField, QueryOperator.Equal);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftField"></param>
+        /// <param name="rightField"></param>
+        /// <returns></returns>
         public static WhereClip operator !=(Field leftField, Field rightField)
         {
             return createWhereClip(leftField, rightField, QueryOperator.NotEqual);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftField"></param>
+        /// <param name="rightField"></param>
+        /// <returns></returns>
         public static WhereClip operator >(Field leftField, Field rightField)
         {
             return createWhereClip(leftField, rightField, QueryOperator.Greater);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftField"></param>
+        /// <param name="rightField"></param>
+        /// <returns></returns>
         public static WhereClip operator >=(Field leftField, Field rightField)
         {
             return createWhereClip(leftField, rightField, QueryOperator.GreaterOrEqual);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftField"></param>
+        /// <param name="rightField"></param>
+        /// <returns></returns>
         public static WhereClip operator <(Field leftField, Field rightField)
         {
             return createWhereClip(leftField, rightField, QueryOperator.Less);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftField"></param>
+        /// <param name="rightField"></param>
+        /// <returns></returns>
         public static WhereClip operator <=(Field leftField, Field rightField)
         {
             return createWhereClip(leftField, rightField, QueryOperator.LessOrEqual);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static WhereClip operator ==(Field field, object value)
         {
             return new WhereClip(field, value, QueryOperator.Equal);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static WhereClip operator ==(object value, Field field)
         {
             return new WhereClip(field, value, QueryOperator.Equal);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static WhereClip operator !=(Field field, object value)
         {
             return new WhereClip(field, value, QueryOperator.NotEqual);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static WhereClip operator !=(object value, Field field)
         {
             return new WhereClip(field, value, QueryOperator.NotEqual);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static WhereClip operator >(Field field, object value)
         {
             return new WhereClip(field, value, QueryOperator.Greater);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static WhereClip operator >(object value, Field field)
         {
             return new WhereClip(field, value, QueryOperator.Less);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static WhereClip operator >=(Field field, object value)
         {
             return new WhereClip(field, value, QueryOperator.GreaterOrEqual);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static WhereClip operator >=(object value, Field field)
         {
             return new WhereClip(field, value, QueryOperator.LessOrEqual);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static WhereClip operator <(Field field, object value)
         {
             return new WhereClip(field, value, QueryOperator.Less);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static WhereClip operator <(object value, Field field)
         {
             return new WhereClip(field, value, QueryOperator.Greater);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static WhereClip operator <=(Field field, object value)
         {
             return new WhereClip(field, value, QueryOperator.LessOrEqual);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static WhereClip operator <=(object value, Field field)
         {
             return new WhereClip(field, value, QueryOperator.GreaterOrEqual);
         }
-
 
         #endregion
 
@@ -1326,107 +1423,128 @@ namespace Dos.ORM
 
         #endregion
     }
-    
+    /// <summary>
+    /// 
+    /// </summary>
     public class FieldAttribute : Attribute
     {
-        private string m_Field;
-        public string Field
-        {
-            get { return m_Field; }
-            set { m_Field = value; }
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Field { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fieldName"></param>
         public FieldAttribute(string fieldName)
         {
-            this.m_Field = fieldName;
+            this.Field = fieldName;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class FieldExtend
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        private const string Tips = "该方法({0})只能用于Dos.ORM lambda表达式！";
+
+        ///// <summary>
+        ///// *
+        ///// </summary>
+        //public static object All(this Entity key)
+        //{
+        //    throw new Exception(string.Format(Tips, "*"));
+        //}
+
+        /// <summary>
+        /// like '%value%' 模糊查询，同Contains。
+        /// </summary>
+        public static bool Like(this object key, object values)
+        {
+            throw new Exception(string.Format(Tips, "Like"));
+        }
+        /// <summary>
+        /// where field in (value,value,value)。传入Array或List&lt;T>。
+        /// </summary>
+        public static bool In<T>(this object key, params T[] values)
+        {
+            throw new Exception(string.Format(Tips, "In"));
+        }
+        /// <summary>
+        /// where field in (value,value,value)。传入Array或List&lt;T>。
+        /// </summary>
+        public static bool In<T>(this object key, List<T> values)
+        {
+            throw new Exception(string.Format(Tips, "In"));
+        }
+        /// <summary>
+        /// where field not in (value,value,value)。传入Array或List&lt;T>。
+        /// </summary>
+        public static bool NotIn<T>(this object key, params T[] values)
+        {
+            throw new Exception(string.Format(Tips, "NotIn"));
+        }
+        /// <summary>
+        /// where field not in (value,value,value)。传入Array或List&lt;T>。
+        /// </summary>
+        public static bool NotIn<T>(this object key, List<T> values)
+        {
+            throw new Exception(string.Format(Tips, "NotIn"));
+        }
+        /// <summary>
+        /// IS NULL
+        /// </summary>
+        public static bool IsNull(this object key)
+        {
+            throw new Exception(string.Format(Tips, "IsNull"));
+        }
+        /// <summary>
+        /// IS NOT NULL
+        /// </summary>
+        public static bool IsNotNull(this object key)
+        {
+            throw new Exception(string.Format(Tips, "IsNotNull"));
+        }
+        /// <summary>
+        /// As
+        /// </summary>
+        public static bool As(this object key, string values)
+        {
+            throw new Exception(string.Format(Tips, "As"));
+        }
+        /// <summary>
+        /// Sum
+        /// </summary>
+        public static decimal Sum(this object key)
+        {
+            throw new Exception(string.Format(Tips, "Sum"));
+        }
+        /// <summary>
+        /// Count
+        /// </summary>
+        public static int Count(this object key)
+        {
+            throw new Exception(string.Format(Tips, "Count"));
+        }
+        /// <summary>
+        /// Avg
+        /// </summary>
+        public static decimal Avg(this object key)
+        {
+            throw new Exception(string.Format(Tips, "Avg"));
+        }
+        /// <summary>
+        /// Len
+        /// </summary>
+        public static int Len(this object key)
+        {
+            throw new Exception(string.Format(Tips, "Len"));
         }
     }
 }
-/// <summary>
-/// 
-/// </summary>
-public static class FieldExtend
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    private const string Tips = "该方法只能用于Dos.ORM lambda表达式！";
 
-    /// <summary>
-    /// 
-    /// </summary>
-    //public static object All(this object key)
-    //{
-    //    throw new Exception(Tips);
-    //}
-
-    /// <summary>
-    /// like '%value%' 模糊查询，同Contains。
-    /// </summary>
-    public static bool Like(this object key, object values)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// where field in (value,value,value)。传入Array或List&lt;T>。
-    /// </summary>
-    public static bool In<T>(this object key, params T[] values)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// where field in (value,value,value)。传入Array或List&lt;T>。
-    /// </summary>
-    public static bool In<T>(this object key, List<T> values)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// where field not in (value,value,value)。传入Array或List&lt;T>。
-    /// </summary>
-    public static bool NotIn<T>(this object key, params T[] values)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// where field not in (value,value,value)。传入Array或List&lt;T>。
-    /// </summary>
-    public static bool NotIn<T>(this object key, List<T> values)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// IS NULL
-    /// </summary>
-    public static bool IsNull(this object key)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// IS NOT NULL
-    /// </summary>
-    public static bool IsNotNull(this object key)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// As
-    /// </summary>
-    public static bool As(this object key, string values)
-    {
-        throw new Exception(Tips);
-    }
-    /// <summary>
-    /// Sum
-    /// </summary>
-    public static int Sum(this object key)
-    {
-        throw new Exception(Tips);
-    }
-    ///// <summary>
-    ///// Sum
-    ///// </summary>
-    //public static int Summ(this object key)
-    //{
-    //    throw new Exception(Tips);
-    //}
-}

@@ -1,18 +1,19 @@
-﻿/*************************************************************************
- * 
- * Hxj.Data
- * 
- * 2010-2-10
- * 
- * steven hu   
- *  
- * Support: http://www.cnblogs.com/huxj
- *   
- * 
- * Change History:
- * 
- * 
-**************************************************************************/
+﻿#region << 版 本 注 释 >>
+/****************************************************
+* 文 件 名：
+* Copyright(c) ITdos
+* CLR 版本: 4.0.30319.18408
+* 创 建 人：steven hu
+* 电子邮箱：
+* 官方网站：www.ITdos.com
+* 创建日期：2010-2-10
+* 文件描述：
+******************************************************
+* 修 改 人：ITdos
+* 修改日期：
+* 备注描述：
+*******************************************************/
+#endregion
 
 using System;
 using System.Data;
@@ -138,7 +139,7 @@ namespace Dos.ORM
             DbCommand command = dbProvider.DbProviderFactory.CreateCommand();
             command.CommandType = commandType;
             command.CommandText = commandText;
-
+            
             return command;
         }
         private void DoLoadDataSet(DbCommand command, DataSet dataSet, string[] tableNames)
@@ -1083,16 +1084,17 @@ namespace Dos.ORM
         {
             if (null == parameters || parameters.Length == 0)
                 return command;
-
+            //var i = 0;
             foreach (Parameter p in parameters)
             {
-                DbParameter dbParameter = CreateParameter(p.ParameterName);
+                DbParameter dbParameter = CreateParameter(p.ParameterName);// + i
                 dbParameter.Value = p.ParameterValue;
                 if (p.ParameterDbType.HasValue)
                     dbParameter.DbType = p.ParameterDbType.Value;
                 if (p.ParameterSize.HasValue)
                     dbParameter.Size = p.ParameterSize.Value;
                 command.Parameters.Add(dbParameter);
+                //i++;
             }
 
             return command;
